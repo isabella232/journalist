@@ -1,0 +1,10 @@
+def start
+  Journalist.start
+  stress_gc
+end
+
+def stress_gc
+  100_000.times { "foo" }
+end
+
+puts "Fixtures loaded"
