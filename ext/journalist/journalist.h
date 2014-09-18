@@ -1,6 +1,8 @@
 #ifndef JOURNALIST_H
 #define JOURNALIST_H 1
 
+#include <stdbool.h>
+
 #include "ruby.h"
 #include "ruby/debug.h"
 
