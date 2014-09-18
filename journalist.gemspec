@@ -9,9 +9,13 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Andre Medeiros"]
   spec.email         = ["me@andremedeiros.info"]
   spec.extensions    = ["ext/journalist/extconf.rb"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
-  spec.homepage      = ""
+  spec.summary       = %q{Easily look into a running Ruby process.}
+  spec.description   = <<-DESC.gsub(/^\s|\t|\n/, '').lstrip
+    Journalist is a gem that intends to make it really easy to get visibility
+    into any running Ruby processes with metrics like GC stats, performance and
+    allocations.
+  DESC
+  spec.homepage      = "https://github.com/journalistrb/journalist"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0")

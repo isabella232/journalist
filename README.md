@@ -1,6 +1,10 @@
 # Journalist
 
-TODO: Write a gem description
+A gem that allows you to look into a running Ruby process.
+
+## Motivation
+
+We lack the tools to have real time visibility in Ruby processes. After seeing [VisualVM](http://visualvm.java.net/) at Baruco, I've realised that a tool like that for CRuby would be amazing. Thus, Journalist was born.
 
 ## Installation
 
@@ -20,11 +24,23 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To start profiling, type:
+
+    Journalist.start
+
+There are a lot of limitations right now, such as this only working for one process at any given time.
+
+## TODO
+
+- [ ] Finish call/return tracepoints
+- [ ] Implement allocation tracepoints
+- [ ] Implement msgpack serialization
+- [ ] Implement command and stream sockets
+- [ ] Build GUI
 
 ## Contributing
 
-1. Fork it ( https://github.com/[my-github-username]/journalist/fork )
+1. Fork it ( https://github.com/journalistrb/journalist/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
