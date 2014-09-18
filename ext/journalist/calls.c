@@ -10,21 +10,30 @@ static struct {
 // even benchmark how long calls take and only output the info on return.)
 static int stack_size = 0;
 
+const char c_call_fmt[] = "c_call: "
+  "class %s method: %s class_method %d stack_depth %d "
+  "path %s line %d\n";
+
 static void
 journalist_on_call_c_call(VALUE tpval, void *data) {
   rb_trace_arg_t *tparg = rb_tracearg_from_tracepoint(tpval);
 
   VALUE self      = rb_tracearg_self(tparg);
   VALUE method_id = rb_tracearg_method_id(tparg);
+  VALUE path      = rb_tracearg_path(tparg);
+  VALUE lineno    = rb_tracearg_lineno(tparg);
+
   bool instance   = TYPE(self) == T_CLASS || TYPE(self) == T_MODULE;
 
   char buffer[4096];
   sprintf(buffer,
-    "c_call: class %s method: %s class_method %d stack_depth %d\n",
+    c_call_fmt,
     rb_obj_classname(self),
     rb_id2name(SYM2ID(method_id)),
     instance,
-    stack_size
+    stack_size,
+    RSTRING_PTR(path),
+    NUM2INT(lineno)
   );
 
   rb_journalist_socket_send(buffer);
