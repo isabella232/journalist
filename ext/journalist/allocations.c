@@ -8,7 +8,7 @@ static struct {
 } allocations_tp_hook;
 
 const char newobj_fmt[] = "newobj: "
-  "type %s class %s method: %s class_method %d path %s line %d\n";
+  "type %s class %s method %s class_method %d path %s line %d\n";
 
 static void
 journalist_on_newobj(VALUE tpval, void *data) {

@@ -11,7 +11,7 @@ static struct {
 static int stack_size = 0;
 
 const char c_call_fmt[] = "c_call: "
-  "class %s method: %s class_method %d stack_depth %d "
+  "class %s method %s class_method %d stack_depth %d "
   "path %s line %d\n";
 
 static void
