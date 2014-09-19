@@ -22,15 +22,14 @@ journalist_on_call_c_call(VALUE tpval, void *data) {
   VALUE method_id = rb_tracearg_method_id(tparg);
   VALUE path      = rb_tracearg_path(tparg);
   VALUE lineno    = rb_tracearg_lineno(tparg);
-
-  bool instance   = TYPE(self) == T_CLASS || TYPE(self) == T_MODULE;
+  bool singleton  = TYPE(self) == T_CLASS || TYPE(self) == T_MODULE;
 
   char buffer[4096];
   sprintf(buffer,
     c_call_fmt,
     rb_obj_classname(self),
     rb_id2name(SYM2ID(method_id)),
-    instance,
+    singleton,
     stack_size,
     RSTRING_PTR(path),
     NUM2INT(lineno)
