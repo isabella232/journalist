@@ -21,6 +21,9 @@ journalist_on_newobj(VALUE tpval, void *data) {
   VALUE obj       = rb_tracearg_object(tparg);
   bool singleton  = TYPE(self) == T_CLASS || TYPE(self) == T_MODULE;
 
+  if (TYPE(self) == T_ICLASS)
+    self = RBASIC_CLASS(self);
+
   char buffer[4096];
   sprintf(buffer,
     newobj_fmt,
