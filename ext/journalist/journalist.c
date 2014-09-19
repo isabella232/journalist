@@ -8,12 +8,14 @@ rb_journalist_init() {
 
   rb_journalist_gc_init();
   rb_journalist_calls_init();
+  rb_journalist_allocations_init();
 }
 
 static VALUE
 journalist_start(VALUE klass) {
   rb_journalist_gc_start();
   rb_journalist_calls_start();
+  rb_journalist_allocations_start();
 
   return Qtrue;
 }
@@ -22,6 +24,7 @@ static VALUE
 journalist_stop(VALUE klass) {
   rb_journalist_gc_stop();
   rb_journalist_calls_stop();
+  rb_journalist_allocations_stop();
 
   return Qtrue;
 }
