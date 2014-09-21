@@ -106,6 +106,9 @@ journalist_allocations_send_types(st_data_t key, st_data_t value, st_data_t _) {
   rb_journalist_socket_send(message);
 
   st_foreach(entry->locations, journalist_allocations_send_locations, key);
+  st_free_table(entry->locations);
+
+  free(entry);
 
   return ST_CONTINUE;
 }
@@ -119,8 +122,13 @@ journalist_allocations_observer(void *threadid) {
 
     pthread_mutex_lock(&alloc_mutex);
     if((last_sent_ago > 500000 && aggregation.total > 0) || aggregation.total > 100000) {
+      // Iterate through the table.
       st_foreach(aggregation.allocations, journalist_allocations_send_types, 0);
+
+      // Clear data.
+      st_clear(aggregation.allocations);
       aggregation.total = 0;
+      aggregation.last_sent_at = current_time;
     }
 
     pthread_mutex_unlock(&alloc_mutex);
@@ -157,9 +165,4 @@ void
 rb_journalist_allocations_stop() {
   rb_tracepoint_disable(allocations_tp_hook.newobj);
   rb_tracepoint_disable(allocations_tp_hook.freeobj);
-}
-
-void
-rb_journalist_allocations_dump() {
-  printf("DUMPING!\n");
 }
