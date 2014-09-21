@@ -79,6 +79,27 @@ journalist_on_freeobj(VALUE tpval, void *data) {
   // rb_journalist_socket_send("freeobj\n");
 }
 
+static int
+journalist_allocations_send_locations(st_data_t key, st_data_t value, st_data_t data) {
+  char *type     = (char *)data;
+  char *location = (char *)key;
+  int total      = (int)value;
+
+  printf("%s -> %s %d\n", type, location, total);
+  return ST_CONTINUE;
+}
+
+static int
+journalist_allocations_send_types(st_data_t key, st_data_t value, st_data_t _) {
+  char *type = (char *)key;
+  aggregation_entry_t *entry = (aggregation_entry_t *)value;
+
+  printf("Type %s (%d allocations)\n", type, entry->total);
+  st_foreach(entry->locations, journalist_allocations_send_locations, key);
+
+  return ST_CONTINUE;
+}
+
 void *
 journalist_allocations_observer(void *threadid) {
   uint64_t current_time, last_sent_ago;
@@ -90,6 +111,7 @@ journalist_allocations_observer(void *threadid) {
     if((last_sent_ago > 500000 && aggregation.total > 0) || aggregation.total > 100000) {
       // TODO: Actually send the data.
       printf("Sending %d allocations.\n", aggregation.total);
+      st_foreach(aggregation.allocations, journalist_allocations_send_types, 0);
       aggregation.total = 0;
     }
 
