@@ -1,7 +1,11 @@
 #ifndef JOURNALIST_H
 #define JOURNALIST_H 1
 
+#include <pthread.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <time.h>
 
 #include "ruby.h"
 #include "ruby/debug.h"
@@ -10,5 +14,7 @@
 #include "calls.h"
 #include "garbage_collection.h"
 #include "socket.h"
+
+uint64_t timeofday_usec();
 
 #endif /* JOURNALIST_H */
