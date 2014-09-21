@@ -85,7 +85,12 @@ journalist_allocations_send_locations(st_data_t key, st_data_t value, st_data_t 
   char *location = (char *)key;
   int total      = (int)value;
 
-  printf("%s -> %s %d\n", type, location, total);
+  char message[4096];
+  sprintf(message, "newobj_loc: type %s loc %s count %d\n",
+    type, location, total);
+
+  rb_journalist_socket_send(message);
+
   return ST_CONTINUE;
 }
 
@@ -94,7 +99,12 @@ journalist_allocations_send_types(st_data_t key, st_data_t value, st_data_t _) {
   char *type = (char *)key;
   aggregation_entry_t *entry = (aggregation_entry_t *)value;
 
-  printf("Type %s (%d allocations)\n", type, entry->total);
+  char message[4096];
+  sprintf(message, "newobj: type %s count %d\n",
+    type, entry->total);
+
+  rb_journalist_socket_send(message);
+
   st_foreach(entry->locations, journalist_allocations_send_locations, key);
 
   return ST_CONTINUE;
@@ -109,8 +119,6 @@ journalist_allocations_observer(void *threadid) {
 
     pthread_mutex_lock(&alloc_mutex);
     if((last_sent_ago > 500000 && aggregation.total > 0) || aggregation.total > 100000) {
-      // TODO: Actually send the data.
-      printf("Sending %d allocations.\n", aggregation.total);
       st_foreach(aggregation.allocations, journalist_allocations_send_types, 0);
       aggregation.total = 0;
     }
