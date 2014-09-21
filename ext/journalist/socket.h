@@ -1,14 +1,13 @@
-#ifndef ASDASDASD
-#define ASDASDASD 1
+#ifndef SOCKET_H
+#define SOCKET_H 1
 
-#include <stdio.h>
-#include <sys/socket.h>
-#include <sys/un.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include "journalist.h"
+
 void rb_journalist_socket_init();
 void rb_journalist_socket_send(char *message);
 
-#endif /* ASDASDASD */
+#endif /* SOCKET_H */
