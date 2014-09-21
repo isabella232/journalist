@@ -10,7 +10,6 @@ static struct {
 static struct {
   int       total;
   st_table *allocations;
-  uint64_t  last_event_at;
   uint64_t  last_sent_at;
 } aggregation;
 
@@ -19,7 +18,7 @@ typedef struct aggregation_entry_s {
   st_table  *locations;
 } aggregation_entry_t;
 
-static pthread_mutex_t alloc_mutex;;
+static pthread_mutex_t alloc_mutex;
 static pthread_t       alloc_observer;
 
 static void
@@ -67,7 +66,6 @@ journalist_on_newobj(VALUE tpval, void *data) {
 
   st_insert(entry->locations, (st_data_t)strdup(loc_key), (st_data_t)file_allocations);
 
-  aggregation.last_event_at = timeofday_usec();
   aggregation.total++;
 
   pthread_mutex_unlock(&alloc_mutex);
@@ -81,18 +79,20 @@ journalist_on_freeobj(VALUE tpval, void *data) {
   // rb_journalist_socket_send("freeobj\n");
 }
 
-
 void *
 journalist_allocations_observer(void *threadid) {
-  uint64_t current_time;
+  uint64_t current_time, last_sent_ago;
   do {
     current_time = timeofday_usec();
-    pthread_mutex_lock(&alloc_mutex);
+    last_sent_ago = current_time - aggregation.last_sent_at;
 
-    if((current_time - aggregation.last_event_at > 500000 || current_time - aggregation.last_sent_at > 500000) && aggregation.total > 0) {
-      printf("Sending %d allocations\n", aggregation.total);
+    pthread_mutex_lock(&alloc_mutex);
+    if((last_sent_ago > 500000 && aggregation.total > 0) || aggregation.total > 100000) {
+      // TODO: Actually send the data.
+      printf("Sending %d allocations.\n", aggregation.total);
       aggregation.total = 0;
     }
+
     pthread_mutex_unlock(&alloc_mutex);
     usleep(500000);
   } while(1);
@@ -110,7 +110,6 @@ rb_journalist_allocations_init() {
 
   aggregation.total = 0;
   aggregation.allocations = st_init_strtable_with_size(1024);
-  aggregation.last_event_at = timeofday_usec();
   aggregation.last_sent_at  = timeofday_usec();
 
   pthread_mutex_init(&alloc_mutex, 0);
