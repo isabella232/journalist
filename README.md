@@ -32,10 +32,11 @@ There are a lot of limitations right now, such as this only working for one proc
 
 ## TODO
 
-- [ ] Finish call/return tracepoints
-- [ ] Implement allocation tracepoints
-- [ ] Implement msgpack serialization
+- [X] Finish call/return tracepoints
+- [X] Implement allocation tracepoints
 - [ ] Implement command and stream sockets
+- [ ] Implement msgpack serialization
+- [ ] Implement event aggregation
 - [ ] Build GUI
 
 ## Contributing
