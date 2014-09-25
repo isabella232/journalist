@@ -47,3 +47,11 @@ timeofday_usec() {
   return (uint64_t)tv.tv_sec*1e6 +
          (uint64_t)tv.tv_usec;
 }
+
+uint64_t
+ru_utime_usec() {
+  struct rusage r_usage;
+  getrusage(RUSAGE_SELF, &r_usage);
+  return (uint64_t)r_usage.ru_utime.tv_sec*1e6 +
+         (uint64_t)r_usage.ru_utime.tv_usec;
+}

@@ -5,17 +5,27 @@ static struct {
   VALUE c_return;
 } calls_tp_hook;
 
-// TODO: For now, a very basic counter. What we really want to do is keep around
-// the trace argument, and keep track of what's going on at all times (maybe
-// even benchmark how long calls take and only output the info on return.)
-static int stack_size = 0;
+static uint64_t call_times[MAX_CALLS] = {0};
+static int call_count = 0;
 
-const char c_call_fmt[] = "c_call: "
+const char slow_cpu_fmt[] = "slow_cpu: "
   "class %s method %s class_method %d stack_depth %d "
-  "path %s line %d\n";
+  "path %s line %d time %" PRIu64 "\n";
 
 static void
 journalist_on_call_c_call(VALUE tpval, void *data) {
+  call_times[call_count] = ru_utime_usec();
+  call_count++;
+}
+
+static void
+journalist_on_call_c_return(VALUE tpval, void *data) {
+  if(call_count == 0) return;
+  call_count--;
+
+  uint64_t diff = ru_utime_usec() - call_times[call_count];
+  if(diff < 250000) return;
+
   rb_trace_arg_t *tparg = rb_tracearg_from_tracepoint(tpval);
 
   VALUE self      = rb_tracearg_self(tparg);
@@ -26,25 +36,17 @@ journalist_on_call_c_call(VALUE tpval, void *data) {
 
   char buffer[4096];
   sprintf(buffer,
-    c_call_fmt,
+    slow_cpu_fmt,
     rb_obj_classname(self),
     rb_id2name(SYM2ID(method_id)),
     singleton,
-    stack_size,
+    call_count,
     RSTRING_PTR(path),
-    NUM2INT(lineno)
+    NUM2INT(lineno),
+    diff
   );
 
   rb_journalist_socket_send(buffer);
-  stack_size++;
-}
-
-static void
-journalist_on_call_c_return(VALUE tpval, void *data) {
-  if(stack_size == 0) return;
-
-  rb_journalist_socket_send("c_return\n");
-  stack_size--;
 }
 
 void

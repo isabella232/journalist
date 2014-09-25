@@ -1,6 +1,7 @@
 #ifndef JOURNALIST_H
 #define JOURNALIST_H 1
 
+#include <inttypes.h>
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -16,5 +17,5 @@
 #include "socket.h"
 
 uint64_t timeofday_usec();
-
+uint64_t ru_utime_usec();
 #endif /* JOURNALIST_H */
