@@ -5,9 +5,11 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "yajl_gen.h"
+
 #include "journalist.h"
 
 void rb_journalist_socket_init();
-void rb_journalist_socket_send(char *message);
+void rb_journalist_socket_send(int count, char *event, ...);
 
 #endif /* SOCKET_H */

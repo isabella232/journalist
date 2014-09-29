@@ -31,32 +31,23 @@ static VALUE sym_count,
   sym_oldmalloc_increase,
   sym_oldmalloc_limit;
 
-const char gc_end_sweep_fmt[] = "gc_end_sweep: "
-  "count %d heap_used %d heap_length %d heap_live_slot %d heap_free_slot %d "
-  "heap_final_slot %d heap_swept_slot %d total_allocated_object %d "
-  "total_freed_object %d malloc_increase %d malloc_limit %d "
-  "minor_gc_count %d major_gc_count %d remembered_shady_object %d "
-  "remembered_shady_object_limit %d old_object %d old_object_limit %d "
-  "oldmalloc_increase %d oldmalloc_limit %d\n";
-
 static void
 journalist_on_gc_start(VALUE tpval, void *data) {
-  rb_journalist_socket_send("gc_start\n");
+  rb_journalist_socket_send(0, "gc_start");
 }
 
 static void
 journalist_on_gc_end_mark(VALUE tpval, void *data) {
-  rb_journalist_socket_send("gc_mark\n");
+  rb_journalist_socket_send(0, "gc_mark");
 }
 
 static void
 journalist_on_gc_end_sweep(VALUE tpval, void *data) {
-  char buffer[4096];
   rb_gc_stat(cookie.gc);
 
-#define STAT(name) NUM2INT(rb_hash_aref(cookie.gc, sym_##name))
-  sprintf(buffer,
-    gc_end_sweep_fmt,
+#define STAT(name) #name, 'i', NUM2INT(rb_hash_aref(cookie.gc, sym_##name))
+  rb_journalist_socket_send(19,
+    "gc_end_sweep",
     STAT(count),
     STAT(heap_used),
     STAT(heap_length),
@@ -78,8 +69,6 @@ journalist_on_gc_end_sweep(VALUE tpval, void *data) {
     STAT(oldmalloc_limit)
   );
 #undef STAT
-
-  rb_journalist_socket_send(buffer);
 }
 
 void
