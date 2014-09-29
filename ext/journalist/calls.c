@@ -8,10 +8,6 @@ static struct {
 static uint64_t call_times[MAX_CALLS] = {0};
 static int call_count = 0;
 
-const char slow_cpu_fmt[] = "slow_cpu: "
-  "class %s method %s class_method %d stack_depth %d "
-  "path %s line %d time %" PRIu64 "\n";
-
 static void
 journalist_on_call_c_call(VALUE tpval, void *data) {
   call_times[call_count] = ru_utime_usec();
@@ -34,19 +30,16 @@ journalist_on_call_c_return(VALUE tpval, void *data) {
   VALUE lineno    = rb_tracearg_lineno(tparg);
   bool singleton  = TYPE(self) == T_CLASS || TYPE(self) == T_MODULE;
 
-  char buffer[4096];
-  sprintf(buffer,
-    slow_cpu_fmt,
-    rb_obj_classname(self),
-    rb_id2name(SYM2ID(method_id)),
-    singleton,
-    call_count,
-    RSTRING_PTR(path),
-    NUM2INT(lineno),
-    diff
+  rb_journalist_socket_send(7,
+    "slow_cpu",
+    "class",        's', rb_obj_classname(self),
+    "method",       's', rb_id2name(SYM2ID(method_id)),
+    "class_method", 'b', singleton,
+    "stack_depth",  'i', call_count,
+    "path",         's', RSTRING_PTR(path),
+    "line",         'i', NUM2INT(lineno),
+    "diff",         't', diff
   );
-
-  rb_journalist_socket_send(buffer);
 }
 
 void

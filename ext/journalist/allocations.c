@@ -76,7 +76,7 @@ journalist_on_newobj(VALUE tpval, void *data) {
 
 static void
 journalist_on_freeobj(VALUE tpval, void *data) {
-  // rb_journalist_socket_send("freeobj\n");
+  // TODO: Keep track of how many objects were freed and aggregate that info.
 }
 
 static int
@@ -85,11 +85,12 @@ journalist_allocations_send_locations(st_data_t key, st_data_t value, st_data_t 
   char *location = (char *)key;
   int total      = (int)value;
 
-  char message[4096];
-  sprintf(message, "newobj_loc: type %s loc %s count %d\n",
-    type, location, total);
-
-  rb_journalist_socket_send(message);
+  rb_journalist_socket_send(3,
+    "newobj_loc",
+    "type",     's', type,
+    "location", 's', location,
+    "count",    'i', total
+  );
 
   return ST_CONTINUE;
 }
@@ -99,11 +100,11 @@ journalist_allocations_send_types(st_data_t key, st_data_t value, st_data_t _) {
   char *type = (char *)key;
   aggregation_entry_t *entry = (aggregation_entry_t *)value;
 
-  char message[4096];
-  sprintf(message, "newobj: type %s count %d\n",
-    type, entry->total);
-
-  rb_journalist_socket_send(message);
+  rb_journalist_socket_send(2,
+    "newobj",
+    "type",  's', type,
+    "total", 'i', entry->total
+  );
 
   st_foreach(entry->locations, journalist_allocations_send_locations, key);
   st_free_table(entry->locations);
