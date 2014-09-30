@@ -34,9 +34,9 @@ There are a lot of limitations right now, such as this only working for one proc
 
 - [X] Finish call/return tracepoints
 - [X] Implement allocation tracepoints
+- [X] Implement event aggregation
+- [X] Implement JSON serialization
 - [ ] Implement command and stream sockets
-- [ ] Implement msgpack serialization
-- [ ] Implement event aggregation
 - [ ] Build GUI
 
 ## Contributing
