@@ -27,7 +27,7 @@ rb_journalist_socket_init() {
 }
 
 void
-rb_journalist_socket_send(int count, char *event, ...)
+rb_journalist_socket_send(int count, const char *event, ...)
 {
   pthread_mutex_lock(&sock_mutex);
 
@@ -40,10 +40,10 @@ rb_journalist_socket_send(int count, char *event, ...)
     va_list arguments;
     va_start(arguments, event);
 
-    char   buf[32];
-    char  *key;
-    int    type;
-    size_t length;
+    char         buf[32];
+    const char  *key;
+    int          type;
+    size_t       length;
 
     char *string;
     int  integer;

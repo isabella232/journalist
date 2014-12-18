@@ -10,6 +10,6 @@
 #include "journalist.h"
 
 void rb_journalist_socket_init();
-void rb_journalist_socket_send(int count, char *event, ...);
+void rb_journalist_socket_send(int count, const char *event, ...);
 
 #endif /* SOCKET_H */
